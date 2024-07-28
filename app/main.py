@@ -13,14 +13,13 @@ def construct_response(status_line, headers, response_body):
     for key, val in headers.items():
         temp = ' '.join([key, val])
         result.append(temp)
-    print(result)
-
-    final = '\r\n'.join(result)
+    # print(result)
+    final = '\r\n'.join(result) + '\r\n'
 
     # print(final)
     result = '\r\n'.join([status_line, final, response_body])
-    print(result)
-    return result
+
+    return result.encode()
 
 
 def main():
@@ -63,8 +62,6 @@ def main():
             body = x[0][6:]
 
             response = construct_response(status, headers, body)
-            response = str.encode(response)
-            #TODO encode response above to byte using encode("sddddd")
             # response = b'HTTP/1.1 200 OK\r\n\r\n'
         else:
             response = b'HTTP/1.1 404 Not Found\r\n\r\n'
