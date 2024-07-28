@@ -5,6 +5,23 @@
 import socket
 import re
 
+def construct_response(status_line, headers, response_body):
+
+    # first let's take care of the headers 
+    result = []
+
+    for key, val in headers.items():
+        temp = ' '.join([key, val])
+        result.append(temp)
+    print(result)
+
+    final = '\r\n'.join(result)
+
+    # print(final)
+    result = '\r\n'.join([status_line, final, response_body])
+    print(result)
+    return result
+
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -15,11 +32,15 @@ def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     # server_socket.accept() # wait for client
 
+   
+
     while True:
         client_connection, client_address = server_socket.accept()
         print(client_address)
         print(client_connection)
 
+        #TODO create a handle_request function
+        
         # Get the client request
         request = client_connection.recv(1024).decode()
         request_split = str(request).split("\r\n")
@@ -27,10 +48,24 @@ def main():
         pattern = "^GET (.+) HTTP/1.1"
         x = re.findall(pattern, request_split[0])
         print(x)
-
+        
         # Send HTTP response
+
         if x[0] == '/':
             response = b'HTTP/1.1 200 OK\r\n\r\n'
+        elif (x[0][0:6] == '/echo/'):
+            print(x[0][6:])
+            status = 'HTTP/1.1 200 OK'
+            headers = {
+                'Content-Type:': 'text/plain',
+                'Content-Length:': str(len(x[0][6:]))
+            }
+            body = x[0][6:]
+
+            response = construct_response(status, headers, body)
+            response = str.encode(response)
+            #TODO encode response above to byte using encode("sddddd")
+            # response = b'HTTP/1.1 200 OK\r\n\r\n'
         else:
             response = b'HTTP/1.1 404 Not Found\r\n\r\n'
 
