@@ -31,8 +31,6 @@ def main():
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     # server_socket.accept() # wait for client
 
-   
-
     while True:
         client_connection, client_address = server_socket.accept()
         print(client_address)
@@ -63,6 +61,19 @@ def main():
 
             response = construct_response(status, headers, body)
             # response = b'HTTP/1.1 200 OK\r\n\r\n'
+        elif x[0] == '/user-agent':
+            pattern = '^User-Agent: (.+)\r\n'
+            user_agent_value = re.findall(pattern, request)
+            print("User-Agent: ", user_agent_value)
+            status = 'HTTP/1.1 200 OK'
+            headers = {
+                'Content-Type:': 'text/plain',
+                'Content-Length:': str(len(user_agent_value))
+            }
+            body = user_agent_value 
+            response = construct_response(status, headers, body)
+
+
         else:
             response = b'HTTP/1.1 404 Not Found\r\n\r\n'
 
