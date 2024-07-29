@@ -66,7 +66,7 @@ def main():
             user_agent_value = re.findall(pattern, request)
             print("request object text: ", request)
             print(type(user_agent_value))
-            print("User-Agent: ", user_agent_value[0])
+            print("User-Agent: ", user_agent_value)
             status = 'HTTP/1.1 200 OK'
             headers = {
                 'Content-Type:': 'text/plain',
