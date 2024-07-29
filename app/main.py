@@ -62,15 +62,16 @@ def main():
             response = construct_response(status, headers, body)
             # response = b'HTTP/1.1 200 OK\r\n\r\n'
         elif x[0] == '/user-agent':
-            pattern = '^User-Agent: (.+)\r\n'
+            pattern = '^User-Agent: (.+)\s'
             user_agent_value = re.findall(pattern, request)
-            print("User-Agent: ", user_agent_value)
+            print("request object text: ", request)
+            print("User-Agent: ", user_agent_value[0])
             status = 'HTTP/1.1 200 OK'
             headers = {
                 'Content-Type:': 'text/plain',
-                'Content-Length:': str(len(user_agent_value))
+                'Content-Length:': str(len(user_agent_value[0]))
             }
-            body = user_agent_value 
+            body = user_agent_value[0]
             response = construct_response(status, headers, body)
 
 
