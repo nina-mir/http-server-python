@@ -62,20 +62,23 @@ def main():
             response = construct_response(status, headers, body)
             # response = b'HTTP/1.1 200 OK\r\n\r\n'
         elif x[0] == '/user-agent':
-            pattern = r'User-Agent: (.+)\s|\S'
-            user_agent_value = re.findall(pattern, request)
-            print("request object text: ", request)
-            print(type(user_agent_value))
-            print("User-Agent: ", user_agent_value)
-            status = 'HTTP/1.1 200 OK'
-            headers = {
-                'Content-Type:': 'text/plain',
-                'Content-Length:': str(len(user_agent_value[0]))
-            }
-            body = user_agent_value[0]
-            response = construct_response(status, headers, body)
-            print(r"RESPONSE: \n", response.decode())
-
+            pattern = r'User-Agent: (.+?)\r\n'
+            match = re.search(pattern, request)
+            if match:
+                user-agent = match.group(1)
+                print("request object text: ", request)
+                print(type(user_agent))
+                print("User-Agent: ", user_agent)
+                status = 'HTTP/1.1 200 OK'
+                headers = {
+                    'Content-Type:': 'text/plain',
+                    'Content-Length:': str(len(user_agent))
+                }
+                body = user_agent
+                response = construct_response(status, headers, body)
+                print(r"RESPONSE: \n", response.decode())
+            else:
+                print("User-Agent header not found ! ! ! ")
 
         else:
             response = b'HTTP/1.1 404 Not Found\r\n\r\n'
