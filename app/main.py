@@ -62,7 +62,7 @@ def main():
             response = construct_response(status, headers, body)
             # response = b'HTTP/1.1 200 OK\r\n\r\n'
         elif x[0] == '/user-agent':
-            pattern = r'User-Agent: (.+)\S'
+            pattern = r'User-Agent: (.+)$'
             user_agent_value = re.findall(pattern, request)
             print("request object text: ", request)
             print("User-Agent: ", user_agent_value[0])
@@ -85,3 +85,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+GET /user-agent HTTP/1.1
+Host: localhost:4221
+User-Agent: pear/pear-mango
+
+
