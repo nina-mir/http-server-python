@@ -85,12 +85,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-GET /user-agent HTTP/1.1
-Host: localhost:4221
-User-Agent: pear/pear-mango
-
-
