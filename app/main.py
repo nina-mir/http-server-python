@@ -62,7 +62,7 @@ def main():
             response = construct_response(status, headers, body)
             # response = b'HTTP/1.1 200 OK\r\n\r\n'
         elif x[0] == '/user-agent':
-            pattern = 'User-Agent: (.+)\s'
+            pattern = r'User-Agent: (.+)\S'
             user_agent_value = re.findall(pattern, request)
             print("request object text: ", request)
             print("User-Agent: ", user_agent_value[0])
@@ -73,6 +73,7 @@ def main():
             }
             body = user_agent_value[0]
             response = construct_response(status, headers, body)
+            print(r"RESPONSE: \n", response.decode())
 
 
         else:
