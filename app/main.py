@@ -65,7 +65,7 @@ def main():
             pattern = r'User-Agent: (.+?)\r\n'
             match = re.search(pattern, request)
             if match:
-                user-agent = match.group(1)
+                user_agent = match.group(1)
                 print("request object text: ", request)
                 print(type(user_agent))
                 print("User-Agent: ", user_agent)
