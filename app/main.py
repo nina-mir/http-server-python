@@ -6,17 +6,18 @@
 import socket
 import re
 import threading
+import time
 
 def main():
     """Main thread, which spawns a second server() thread."""
     print("main() starting")
     # signals = {"shutdown": False}
     thread = threading.Thread(target=server)
-    thread.daemon = True  # Ensure the thread exits when the main program exits
+    # thread.daemon = True  # Ensure the thread exits when the main program exits
     thread.start()
-    # time.sleep(10) # Give up execution to the 'server' thread (see Pitfall 1)
+    time.sleep(10) # Give up execution to the 'server' thread (see Pitfall 1)
     # signals["shutdown"] = True  # Tell server thread to shut down
-    # thread.join()  # Wait for server thread to shut down
+    thread.join()  # Wait for server thread to shut down
     print("main() shutting down")
 
 def construct_response(status_line, headers, response_body):
