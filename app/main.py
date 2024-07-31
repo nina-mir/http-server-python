@@ -132,7 +132,6 @@ def server():
         else:
             response = b'HTTP/1.1 404 Not Found\r\n\r\n'
 
-        print("Client_Connection: ", client_connection)
         client_connection.sendall(response)
         client_connection.close()
 
