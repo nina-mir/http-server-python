@@ -1,97 +1,29 @@
-# Uncomment this to pass the first stage
-# Another resource: 
-# https://www.codementor.io/@joaojonesventura/building-a-basic-http-server-from-scratch-in-python-1cedkg0842
-# another source for a deep dive into networking: https://hpbn.co/#toc
-# threading source: https://eecs485staff.github.io/p4-mapreduce/threads-sockets.html#sockets-and-waiting
 import socket
 import re
 import threading
-import time
 
-def main():
-    """Main thread, which spawns a second server() thread."""
-    print("main() starting")
-    # signals = {"shutdown": False}
-    thread = threading.Thread(target=server)
-    # thread.daemon = True  # Ensure the thread exits when the main program exits
-    thread.start()
-    time.sleep(10) # Give up execution to the 'server' thread (see Pitfall 1)
-    # signals["shutdown"] = True  # Tell server thread to shut down
-    thread.join()  # Wait for server thread to shut down
-    print("main() shutting down")
 
-def construct_response(status_line, headers, response_body):
 
-    # first let's take care of the headers 
-    result = []
+# Define socket host and port
+SERVER_HOST = 'localhost'
+SERVER_PORT = 4221
 
-    for key, val in headers.items():
-        temp = ' '.join([key, val])
-        result.append(temp)
-    # print(result)
-    final = '\r\n'.join(result) + '\r\n'
+# Create socket
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server_socket.bind((SERVER_HOST, SERVER_PORT))
 
-    # print(final)
-    result = '\r\n'.join([status_line, final, response_body])
 
-    return result.encode()
+# server_socket.listen(1)
+# print('Listening on port %s ...' % SERVER_PORT)
+# server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
 
-def choose_response(x, request, client_connection):
-    response = ""
-    if x[0] == '/':
-        response = b'HTTP/1.1 200 OK\r\n\r\n'
-    elif (x[0][0:6] == '/echo/'):
-        print(x[0][6:])
-        status = 'HTTP/1.1 200 OK'
-        headers = {
-            'Content-Type:': 'text/plain',
-            'Content-Length:': str(len(x[0][6:]))
-        }
-        body = x[0][6:]
 
-        response = construct_response(status, headers, body)
-        # response = b'HTTP/1.1 200 OK\r\n\r\n'
-    elif x[0] == '/user-agent':
-        pattern = r'User-Agent: (.+?)\r\n'
-        match = re.search(pattern, request)
-        if match:
-            user_agent = match.group(1)
-            print("request object text: ", request)
-            print(type(user_agent))
-            print("User-Agent: ", user_agent)
-            status = 'HTTP/1.1 200 OK'
-            headers = {
-                'Content-Type:': 'text/plain',
-                'Content-Length:': str(len(user_agent))
-            }
-            body = user_agent
-            response = construct_response(status, headers, body)
-            print(r"RESPONSE: \n", response.decode())
-        else:
-            print("User-Agent header not found ! ! ! ")
-    else:
-        response = b'HTTP/1.1 404 Not Found\r\n\r\n'
-
-    return response
-        
-def server():
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
-    print("Logs from your program will appear here!")
-
-    # Uncomment this to pass the first stage
-    #
-    server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    # server_socket.accept() # wait for client
-    
-
-    while True:
-
-        client_connection, client_address = server_socket.accept()
-        print(client_address)
-        print("Client_Connection: ", client_connection)
-        #TODO create a handle_request function
-        # Get the client request
-        request = client_connection.recv(1024).decode()
+def handle_client(conn, addr):
+    print(f"[NEW CONNECTION] {addr} connected.")
+    connected = True
+    while connected:
+        request = conn.recv(1024).decode()
         request_split = str(request).split("\r\n")
         print(request_split)
         pattern = "^GET (.+) HTTP/1.1"
@@ -134,15 +66,33 @@ def server():
             response = b'HTTP/1.1 404 Not Found\r\n\r\n'
 
         print("RESPONSE:   ", response)
-        client_connection.sendall(response)
-        client_connection.close()
+        conn.sendall(response)
+        # client_connection.close()
+        # msg_length = conn.recv(HEADER).decode(FORMAT)
+        # if msg_length:
+        #     msg_length = int(msg_length)
+        #     msg = conn.recv(msg_length).decode(FORMAT)
+        #     if msg == DISCONNECT_MESSAGE:
+        #         connected = False
+        #     print(f"[{addr}] {msg}")
+        # conn.send("Msg received".encode(FORMAT))
+    conn.close()
 
 
 
-        # final_response = choose_response(x, request, client_connection)
-        
-        
+def server():
+    server_socket.listen()
+    print(f"[LISTENING] Server is listening .....")
+    while True:
+        conn, addr = server_socket.accept()
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
+
+def main():
+    print("[STARTING] server is starting...")
+    server()
 
 if __name__ == "__main__":
     main()
