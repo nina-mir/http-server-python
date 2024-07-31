@@ -19,6 +19,23 @@ server_socket.bind((SERVER_HOST, SERVER_PORT))
 # server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
 
 
+
+def construct_response(status_line, headers, response_body):
+
+    # first let's take care of the headers 
+    result = []
+
+    for key, val in headers.items():
+        temp = ' '.join([key, val])
+        result.append(temp)
+    # print(result)
+    final = '\r\n'.join(result) + '\r\n'
+
+    # print(final)
+    result = '\r\n'.join([status_line, final, response_body])
+
+    return result.encode()
+
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
     connected = True
@@ -87,7 +104,7 @@ def server():
         conn, addr = server_socket.accept()
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
 
 
 def main():
