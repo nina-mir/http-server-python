@@ -21,7 +21,43 @@ def construct_response(status_line, headers, response_body):
 
     return result.encode()
 
+def choose_response(x, request):
+    if x[0] == '/':
+        response = b'HTTP/1.1 200 OK\r\n\r\n'
+    elif (x[0][0:6] == '/echo/'):
+        print(x[0][6:])
+        status = 'HTTP/1.1 200 OK'
+        headers = {
+            'Content-Type:': 'text/plain',
+            'Content-Length:': str(len(x[0][6:]))
+        }
+        body = x[0][6:]
 
+        response = construct_response(status, headers, body)
+        # response = b'HTTP/1.1 200 OK\r\n\r\n'
+    elif x[0] == '/user-agent':
+        pattern = r'User-Agent: (.+?)\r\n'
+        match = re.search(pattern, request)
+        if match:
+            user_agent = match.group(1)
+            print("request object text: ", request)
+            print(type(user_agent))
+            print("User-Agent: ", user_agent)
+            status = 'HTTP/1.1 200 OK'
+            headers = {
+                'Content-Type:': 'text/plain',
+                'Content-Length:': str(len(user_agent))
+            }
+            body = user_agent
+            response = construct_response(status, headers, body)
+            print(r"RESPONSE: \n", response.decode())
+        else:
+            print("User-Agent header not found ! ! ! ")
+    else:
+        response = b'HTTP/1.1 404 Not Found\r\n\r\n'
+
+    return response
+        
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
@@ -30,58 +66,22 @@ def main():
     #
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     # server_socket.accept() # wait for client
+    client_connection, client_address = server_socket.accept()
+    print(client_address)
+    print(client_connection)
+    #TODO create a handle_request function
+    # Get the client request
+    request = client_connection.recv(1024).decode()
+    request_split = str(request).split("\r\n")
+    print(request_split)
+    pattern = "^GET (.+) HTTP/1.1"
+    x = re.findall(pattern, request_split[0])
+    print(x)
 
     while True:
-        client_connection, client_address = server_socket.accept()
-        print(client_address)
-        print(client_connection)
-
-        #TODO create a handle_request function
-        
-        # Get the client request
-        request = client_connection.recv(1024).decode()
-        request_split = str(request).split("\r\n")
-        print(request_split)
-        pattern = "^GET (.+) HTTP/1.1"
-        x = re.findall(pattern, request_split[0])
-        print(x)
-        
         # Send HTTP response
 
-        if x[0] == '/':
-            response = b'HTTP/1.1 200 OK\r\n\r\n'
-        elif (x[0][0:6] == '/echo/'):
-            print(x[0][6:])
-            status = 'HTTP/1.1 200 OK'
-            headers = {
-                'Content-Type:': 'text/plain',
-                'Content-Length:': str(len(x[0][6:]))
-            }
-            body = x[0][6:]
-
-            response = construct_response(status, headers, body)
-            # response = b'HTTP/1.1 200 OK\r\n\r\n'
-        elif x[0] == '/user-agent':
-            pattern = r'User-Agent: (.+?)\r\n'
-            match = re.search(pattern, request)
-            if match:
-                user_agent = match.group(1)
-                print("request object text: ", request)
-                print(type(user_agent))
-                print("User-Agent: ", user_agent)
-                status = 'HTTP/1.1 200 OK'
-                headers = {
-                    'Content-Type:': 'text/plain',
-                    'Content-Length:': str(len(user_agent))
-                }
-                body = user_agent
-                response = construct_response(status, headers, body)
-                print(r"RESPONSE: \n", response.decode())
-            else:
-                print("User-Agent header not found ! ! ! ")
-
-        else:
-            response = b'HTTP/1.1 404 Not Found\r\n\r\n'
+        response = choose_response(x, request)
 
         client_connection.sendall(response)
         client_connection.close()
