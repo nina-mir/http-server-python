@@ -15,7 +15,7 @@ def main():
     thread.start()
     # time.sleep(10) # Give up execution to the 'server' thread (see Pitfall 1)
     # signals["shutdown"] = True  # Tell server thread to shut down
-    thread.join()  # Wait for server thread to shut down
+    # thread.join()  # Wait for server thread to shut down
     print("main() shutting down")
 
 def construct_response(status_line, headers, response_body):
