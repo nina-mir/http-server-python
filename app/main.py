@@ -97,7 +97,6 @@ def server():
         print(x)
 
         # Send HTTP response
-        response = ""
         if x[0] == '/':
             response = b'HTTP/1.1 200 OK\r\n\r\n'
         elif (x[0][0:6] == '/echo/'):
@@ -132,6 +131,7 @@ def server():
         else:
             response = b'HTTP/1.1 404 Not Found\r\n\r\n'
 
+        print("RESPONSE:   ", response)
         client_connection.sendall(response)
         client_connection.close()
 
