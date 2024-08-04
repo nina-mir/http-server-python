@@ -130,7 +130,7 @@ def handle_client(conn, addr, abs_path):
                 status = 'HTTP/1.1 200 OK'
                 headers = {
                     'Content-Type:': 'application/octet-stream',
-                    'Content-Length:': str(file_result[2]))
+                    'Content-Length:': str(file_result[2])
                 }
                 body = file_result[1] # content of the file
                 response = construct_response(status, headers, body)
