@@ -1,12 +1,26 @@
+# Uncomment this to pass the first stage
+# Another resource: 
+# https://www.codementor.io/@joaojonesventura/building-a-basic-http-server-from-scratch-in-python-1cedkg0842
+# another source for a deep dive into networking: https://hpbn.co/#toc
+# threading source: https://eecs485staff.github.io/p4-mapreduce/threads-sockets.html#sockets-and-waiting
+
+import contextlib
+import sys
+import os
 import socket
 import re
 import threading
 
 
-
 # Define socket host and port
 SERVER_HOST = 'localhost'
 SERVER_PORT = 4221
+# SERVER = ""
+# Another way to get the local IP address automatically
+SERVER = socket.gethostbyname(socket.gethostname())
+print(SERVER)
+print(socket.gethostname())
+# ADDR = (SERVER, PORT)
 
 # Create socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,6 +33,52 @@ server_socket.bind((SERVER_HOST, SERVER_PORT))
 # server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
 
 
+def inpect_file(abs_path=None, file_name=None):
+    ''' 
+    Description
+    -----------
+    This method inspects the exitence of a file,
+    reading its content if it exists and returning it.
+
+    Parameters
+    ----------
+    abs_path : str
+        the provided absolute path from the commandline
+    file_name : str
+        the provided filename
+    
+    Returns
+    -------
+    boolean
+        True if the file exists and False if not.
+    str
+        if the file is present, the content of the file.
+    int
+        size of the target file in bytes
+    '''
+    is_present, file_path, file_content, file_size = False, None, None, None
+
+    if abs_path and file_name:
+    # check if the file name exists in the provided path
+    # List contents of the provided absolute directory 
+        try:
+            with os.scandir(abs_path) as entries:
+                for entry in entries:
+                    if entry.name == file_name:
+                        is_present = True
+                        file_path = os.path.join(abs_path, entry.name)
+                        file_size = os.path.getsize(file_path)
+                        break
+        except FileNotFoundError:
+            print(f"The directory {abs_path} does not exist.")
+
+    # Let's read the file content
+    # Reading a file
+    if is_present:
+        with open(file_path, 'r') as file:
+            file_content = file.read()
+    
+    return [is_present, file_content, file_size]
 
 def construct_response(status_line, headers, response_body):
 
@@ -36,11 +96,13 @@ def construct_response(status_line, headers, response_body):
 
     return result.encode()
 
-def handle_client(conn, addr):
+def handle_client(conn, addr, abs_path):
     print(f"[NEW CONNECTION] {addr} connected.")
+    response = ""
     connected = True
     while connected:
         request = conn.recv(1024).decode()
+        print(request)
         request_split = str(request).split("\r\n")
         print(request_split)
         pattern = "^GET (.+) HTTP/1.1"
@@ -58,9 +120,22 @@ def handle_client(conn, addr):
                 'Content-Length:': str(len(x[0][6:]))
             }
             body = x[0][6:]
-
             response = construct_response(status, headers, body)
-            # response = b'HTTP/1.1 200 OK\r\n\r\n'
+        elif (x[0][0:7] == '/files/'):
+            # handle FILE related requests
+            query_file_name = x[0][7:]
+            file_result = inpect_file(abs_path, query_file_name)
+            if file_result[0]:
+                # file exists + construct a response
+                status = 'HTTP/1.1 200 OK'
+                headers = {
+                    'Content-Type:': 'application/octet-stream',
+                    'Content-Length:': str(file_result[2]))
+                }
+                body = file_result[1] # content of the file
+                response = construct_response(status, headers, body)
+            else:
+                response = b'HTTP/1.1 404 Not Found\r\n\r\n'
         elif x[0] == '/user-agent':
             pattern = r'User-Agent: (.+?)\r\n'
             match = re.search(pattern, request)
@@ -97,19 +172,30 @@ def handle_client(conn, addr):
 
 
 
-def server():
+def server(abs_path):
     server_socket.listen()
-    print(f"[LISTENING] Server is listening .....")
+    print(f"[LISTENING] Server is listening on {SERVER}")
     while True:
         conn, addr = server_socket.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread = threading.Thread(target=handle_client, args=(conn, addr, abs_path))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
 
 
 def main():
     print("[STARTING] server is starting...")
-    server()
+    args = sys.argv
+    abs_path = ""
+    if len(args) > 1:
+        with contextlib.suppress(ValueError):
+            flag_index = args.index("--directory") 
+            if len(args) > flag_index + 1:
+                abs_path = args[flag_index + 1]
+    
+    if not abs_path:
+        print("Provided Path is---  ", abs_path)
+
+    server(abs_path)
 
 if __name__ == "__main__":
     main()
