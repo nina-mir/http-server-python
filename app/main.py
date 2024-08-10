@@ -1,4 +1,3 @@
-# Uncomment this to pass the first stage
 # Another resource: 
 # https://www.codementor.io/@joaojonesventura/building-a-basic-http-server-from-scratch-in-python-1cedkg0842
 # another source for a deep dive into networking: https://hpbn.co/#toc
@@ -104,61 +103,34 @@ def handle_client(conn, addr, abs_path):
         request = conn.recv(1024).decode()
         print(request)
         request_split = str(request).split("\r\n")
-        print(request_split)
-        pattern = "^GET (.+) HTTP/1.1"
-        x = re.findall(pattern, request_split[0])
-        print(x)
 
-        # Send HTTP response
-        if x[0] == '/':
-            response = b'HTTP/1.1 200 OK\r\n\r\n'
-        elif (x[0][0:6] == '/echo/'):
-            print(x[0][6:])
-            status = 'HTTP/1.1 200 OK'
-            headers = {
-                'Content-Type:': 'text/plain',
-                'Content-Length:': str(len(x[0][6:]))
-            }
-            body = x[0][6:]
-            response = construct_response(status, headers, body)
-        elif (x[0][0:7] == '/files/'):
-            # handle FILE related requests
-            query_file_name = x[0][7:]
-            file_result = inpect_file(abs_path, query_file_name)
-            if file_result[0]:
-                # file exists + construct a response
-                status = 'HTTP/1.1 200 OK'
-                headers = {
-                    'Content-Type:': 'application/octet-stream',
-                    'Content-Length:': str(file_result[2])
-                }
-                body = file_result[1] # content of the file
-                response = construct_response(status, headers, body)
-            else:
-                response = b'HTTP/1.1 404 Not Found\r\n\r\n'
-        elif x[0] == '/user-agent':
-            pattern = r'User-Agent: (.+?)\r\n'
-            match = re.search(pattern, request)
-            if match:
-                user_agent = match.group(1)
-                print("request object text: ", request)
-                print(type(user_agent))
-                print("User-Agent: ", user_agent)
-                status = 'HTTP/1.1 200 OK'
-                headers = {
-                    'Content-Type:': 'text/plain',
-                    'Content-Length:': str(len(user_agent))
-                }
-                body = user_agent
-                response = construct_response(status, headers, body)
-                print(r"RESPONSE: \n", response.decode())
-            else:
-                print("User-Agent header not found ! ! ! ")
-        else:
-            response = b'HTTP/1.1 404 Not Found\r\n\r\n'
+        # To-DO 
+        # Figure out if this is a POST request of GET
+        # if GET request, do the handle_GET()
+        # If POST, do the post request handle_POST()
+
+        print(request_split)
+
+        response = ""
+        http_verb = ""
+        
+        if len(request_split) > 0:
+            http_verb = request_split[0].split(" ")
+        if len(http_verb) > 0:
+            http_verb = http_verb[0]
+        
+        if http_verb == 'GET':
+            pattern = "^GET (.+) HTTP/1.1"
+            x = re.findall(pattern, request_split[0])
+            print("x is: ", x)
+            response = handle_GET(x, abs_path)
+        elif http_verb == 'POST':
+            response = handle_POST(x, abs_path)
+
 
         print("RESPONSE:   ", response)
         conn.sendall(response)
+        '''
         # client_connection.close()
         # msg_length = conn.recv(HEADER).decode(FORMAT)
         # if msg_length:
@@ -167,10 +139,62 @@ def handle_client(conn, addr, abs_path):
         #     if msg == DISCONNECT_MESSAGE:
         #         connected = False
         #     print(f"[{addr}] {msg}")
-        # conn.send("Msg received".encode(FORMAT))
+        # conn.send("Msg received".encode(FORMAT))'''
+
     conn.close()
 
 
+def handle_GET(x, abs_path):
+# Send HTTP response
+    print("GET request being handled ...")
+    if x[0] == '/':
+        response = b'HTTP/1.1 200 OK\r\n\r\n'
+    elif (x[0][0:6] == '/echo/'):
+        print(x[0][6:])
+        status = 'HTTP/1.1 200 OK'
+        headers = {
+            'Content-Type:': 'text/plain',
+            'Content-Length:': str(len(x[0][6:]))
+        }
+        body = x[0][6:]
+        response = construct_response(status, headers, body)
+    elif (x[0][0:7] == '/files/'):
+        # handle FILE related requests
+        query_file_name = x[0][7:]
+        file_result = inpect_file(abs_path, query_file_name)
+        if file_result[0]:
+            # file exists + construct a response
+            status = 'HTTP/1.1 200 OK'
+            headers = {
+                'Content-Type:': 'application/octet-stream',
+                'Content-Length:': str(file_result[2])
+            }
+            body = file_result[1] # content of the file
+            response = construct_response(status, headers, body)
+        else:
+            response = b'HTTP/1.1 404 Not Found\r\n\r\n'
+    elif x[0] == '/user-agent':
+        pattern = r'User-Agent: (.+?)\r\n'
+        match = re.search(pattern, request)
+        if match:
+            user_agent = match.group(1)
+            print("request object text: ", request)
+            print(type(user_agent))
+            print("User-Agent: ", user_agent)
+            status = 'HTTP/1.1 200 OK'
+            headers = {
+                'Content-Type:': 'text/plain',
+                'Content-Length:': str(len(user_agent))
+            }
+            body = user_agent
+            response = construct_response(status, headers, body)
+            print(r"RESPONSE: \n", response.decode())
+        else:
+            print("User-Agent header not found ! ! ! ")
+    else:
+        response = b'HTTP/1.1 404 Not Found\r\n\r\n'
+
+    return response
 
 def server(abs_path):
     server_socket.listen()
@@ -180,7 +204,6 @@ def server(abs_path):
         thread = threading.Thread(target=handle_client, args=(conn, addr, abs_path))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
-
 
 def main():
     print("[STARTING] server is starting...")
