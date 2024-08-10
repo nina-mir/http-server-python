@@ -195,11 +195,11 @@ def handle_GET(x, abs_path):
 
     return response
 
-def handle_POST(x, abs_path):
+def handle_POST(request_split, abs_path):
 # To-DO 1) extract the filename from the request body
     pattern = r'/files/(.*) '
-    file_name = re.findall(pattern, x[0])
-    print(file_name)
+    file_name = re.findall(pattern, request_split[0])
+    print("file to be created is called: ", file_name)
 
 
 
