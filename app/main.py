@@ -143,7 +143,6 @@ def handle_client(conn, addr, abs_path):
 
     conn.close()
 
-
 def handle_GET(x, abs_path):
 # Send HTTP response
     print("GET request being handled ...")
@@ -195,6 +194,23 @@ def handle_GET(x, abs_path):
         response = b'HTTP/1.1 404 Not Found\r\n\r\n'
 
     return response
+
+def handle_POST(x, abs_path):
+# To-DO 1) extract the filename from the request body
+    pattern = r'/files/(.*) '
+    file_name = re.findall(pattern, x[0])
+    print(file_name)
+
+
+
+
+# To-DO 2) Extract the byte size of the message 
+# To-Do 3) Extract the body of the file from the request 
+# To-Do 4) send a response back b'HTTP/1.1 201 Created\r\n\r\n'
+
+
+
+
 
 def server(abs_path):
     server_socket.listen()
