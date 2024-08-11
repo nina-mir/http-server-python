@@ -202,7 +202,7 @@ def handle_POST(request, request_split, abs_path):
     print("file to be created is called: ", file_to_write)
 # To-DO 2) Extract the byte size of the message 
     pattern = r'Content-Length:\s*(\d+)'
-    byte_to_write = re.finall(pattern, request)
+    byte_to_write = re.findall(pattern, request)
     print("Bytes to write to file:  ", byte_to_write)
 
 # To-Do 3) Extract the body of the file from the request 
