@@ -198,13 +198,10 @@ def handle_GET(x, abs_path):
 def handle_POST(request_split, abs_path):
 # To-DO 1) extract the filename from the request body
     pattern = r'/files/(.*) '
-    file_name = re.findall(pattern, request_split[0])
-    print("file to be created is called: ", file_name)
-
-
-
-
+    file_to_write = re.findall(pattern, request_split[0])
+    print("file to be created is called: ", file_to_write)
 # To-DO 2) Extract the byte size of the message 
+    
 # To-Do 3) Extract the body of the file from the request 
 # To-Do 4) send a response back b'HTTP/1.1 201 Created\r\n\r\n'
 
