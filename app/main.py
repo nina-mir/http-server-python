@@ -125,7 +125,7 @@ def handle_client(conn, addr, abs_path):
             print("x is: ", x)
             response = handle_GET(x, abs_path)
         elif http_verb == 'POST':
-            response = handle_POST(x, abs_path)
+            response = handle_POST(request_split, abs_path)
 
 
         print("RESPONSE:   ", response)
