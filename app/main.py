@@ -125,7 +125,7 @@ def handle_client(conn, addr, abs_path):
             print("x is: ", x)
             response = handle_GET(x, abs_path)
         elif http_verb == 'POST':
-            response = handle_POST(request_split, abs_path)
+            response = handle_POST(request, request_split, abs_path)
 
 
         print("RESPONSE:   ", response)
@@ -195,15 +195,21 @@ def handle_GET(x, abs_path):
 
     return response
 
-def handle_POST(request_split, abs_path):
+def handle_POST(request, request_split, abs_path):
 # To-DO 1) extract the filename from the request body
     pattern = r'/files/(.*) '
     file_to_write = re.findall(pattern, request_split[0])
     print("file to be created is called: ", file_to_write)
 # To-DO 2) Extract the byte size of the message 
-    
+    pattern = r'Content-Length:\s*(\d+)'
+    byte_to_write = re.finall(pattern, request)
+    print("Bytes to write to file:  ", byte_to_write)
+
 # To-Do 3) Extract the body of the file from the request 
-# To-Do 4) send a response back b'HTTP/1.1 201 Created\r\n\r\n'
+    file_body = request_split[-1]
+    print("content of file is: ", file_body)
+# To-Do 4) send a response back 
+    return b'HTTP/1.1 201 Created\r\n\r\n'
 
 
 
