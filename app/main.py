@@ -208,7 +208,14 @@ def handle_POST(request, request_split, abs_path):
 # To-Do 3) Extract the body of the file from the request 
     file_body = request_split[-1]
     print("content of file is: ", file_body)
-# To-Do 4) send a response back 
+
+# To-Do 4-a) create a file and write to disk 
+    file_path = os.path.join(abs_path, file_to_write)
+    with open(file_path, 'w') as f:
+        f.write(file_body)
+    f.close()
+
+# To-Do 4-b) send a response back 
     return b'HTTP/1.1 201 Created\r\n\r\n'
 
 
