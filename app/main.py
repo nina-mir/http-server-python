@@ -210,7 +210,7 @@ def handle_POST(request, request_split, abs_path):
     print("content of file is: ", file_body)
 
 # To-Do 4-a) create a file and write to disk 
-    file_path = os.path.join(abs_path, file_to_write)
+    file_path = os.path.join(abs_path, file_to_write[0])
     with open(file_path, 'w') as f:
         f.write(file_body)
     f.close()
