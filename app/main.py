@@ -123,7 +123,7 @@ def handle_client(conn, addr, abs_path):
             pattern = "^GET (.+) HTTP/1.1"
             x = re.findall(pattern, request_split[0])
             print("x is: ", x)
-            response = handle_GET(x, abs_path)
+            response = handle_GET(request, x, abs_path)
         elif http_verb == 'POST':
             response = handle_POST(request, request_split, abs_path)
 
@@ -143,7 +143,7 @@ def handle_client(conn, addr, abs_path):
 
     conn.close()
 
-def handle_GET(x, abs_path):
+def handle_GET(request, x, abs_path):
 # Send HTTP response
     print("GET request being handled ...")
     if x[0] == '/':
