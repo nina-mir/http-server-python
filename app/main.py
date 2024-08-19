@@ -149,13 +149,25 @@ def handle_GET(request, x, abs_path):
     if x[0] == '/':
         response = b'HTTP/1.1 200 OK\r\n\r\n'
     elif (x[0][0:6] == '/echo/'):
-        print(x[0][6:])
+        print("echo message: ", x[0][6:])
+        
         status = 'HTTP/1.1 200 OK'
+
         headers = {
             'Content-Type:': 'text/plain',
             'Content-Length:': str(len(x[0][6:]))
         }
         body = x[0][6:]
+
+        # 1) To-DO write logic to detect Accept-Encoding
+        pattern = r'Accept-Encoding: (.+?)\r\n'
+        match = re.search(pattern, request)
+        if match:
+            compression_scheme = match.group(1)
+            if compression_scheme == "gzip":
+                new_item = {'Content-Encoding:': 'gzip'}
+                headers.update(new_item)
+
         response = construct_response(status, headers, body)
     elif (x[0][0:7] == '/files/'):
         # handle FILE related requests
