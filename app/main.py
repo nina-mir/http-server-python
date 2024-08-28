@@ -9,6 +9,7 @@ import os
 import socket
 import re
 import threading
+import gzip
 
 
 # Define socket host and port
@@ -168,6 +169,12 @@ def handle_GET(request, x, abs_path):
             if "gzip" in compression_scheme:
                 new_item = {'Content-Encoding:': 'gzip'}
                 headers.update(new_item)
+                utf_encoded = gzip.compress(body.encode('utf-8'))
+                length_str = len(utf_encoded)
+                body = utf_encoded.hex(" ").upper()
+                # to-DO: modify the length of content-length header
+                header['Content-Length:'] = length_str
+                
 
         response = construct_response(status, headers, body)
     elif (x[0][0:7] == '/files/'):
