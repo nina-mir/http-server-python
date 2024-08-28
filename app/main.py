@@ -164,7 +164,8 @@ def handle_GET(request, x, abs_path):
         match = re.search(pattern, request)
         if match:
             compression_scheme = match.group(1)
-            if compression_scheme == "gzip":
+            # To-DO: figure out if this is a comma seperated list of not
+            if "gzip" in compression_scheme:
                 new_item = {'Content-Encoding:': 'gzip'}
                 headers.update(new_item)
 
