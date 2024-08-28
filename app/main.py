@@ -173,7 +173,7 @@ def handle_GET(request, x, abs_path):
                 length_str = len(utf_encoded)
                 body = utf_encoded.hex(" ").upper()
                 # to-DO: modify the length of content-length header
-                headers['Content-Length:'] = length_str
+                headers['Content-Length:'] = str(length_str)
                 
 
         response = construct_response(status, headers, body)
