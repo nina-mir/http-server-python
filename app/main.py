@@ -171,7 +171,7 @@ def handle_GET(request, x, abs_path):
                 headers.update(new_item)
                 utf_encoded = gzip.compress(body.encode('utf-8'))
                 length_str = len(utf_encoded)
-                body = utf_encoded.hex(" ").upper()
+                body = utf_encoded.hex()
                 # to-DO: modify the length of content-length header
                 headers['Content-Length:'] = str(length_str)
                 
