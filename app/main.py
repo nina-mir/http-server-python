@@ -106,7 +106,7 @@ def handle_client(conn, addr, abs_path):
         request_split = str(request).split("\r\n")
 
         # To-DO 
-        # Figure out if this is a POST request of GET
+        # Figure out if this is a POST request or GET
         # if GET request, do the handle_GET()
         # If POST, do the post request handle_POST()
 
