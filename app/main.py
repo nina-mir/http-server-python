@@ -169,10 +169,10 @@ def handle_GET(request, x, abs_path):
             if "gzip" in compression_scheme:
                 new_item = {'Content-Encoding:': 'gzip'}
                 headers.update(new_item)
-                utf_encoded = gzip.compress(body.encode())
+                utf_encoded = gzip.compress(body.encode('utf-8'))
                 print("UTF_encoded: ", utf_encoded)
                 length_str = len(utf_encoded)
-                body = utf_encoded
+                body = utf_encoded.hex()
                 print("hex body: ", body)
                 # to-DO: modify the length of content-length header
                 headers['Content-Length:'] = str(length_str)
