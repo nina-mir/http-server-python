@@ -152,7 +152,7 @@ def handle_GET(request, x, abs_path):
     elif (x[0][0:6] == '/echo/'):
         print("echo message: ", x[0][6:])
         
-        status = b'HTTP/1.1 200 OK'
+        status = 'HTTP/1.1 200 OK'
 
         headers = {
             'Content-Type:': 'text/plain',
