@@ -152,7 +152,7 @@ def handle_GET(request, x, abs_path):
     elif (x[0][0:6] == '/echo/'):
         print("echo message: ", x[0][6:])
         
-        status = 'HTTP/1.1 200 OK'
+        status = b'HTTP/1.1 200 OK'
 
         headers = {
             'Content-Type:': 'text/plain',
@@ -172,7 +172,7 @@ def handle_GET(request, x, abs_path):
                 utf_encoded = gzip.compress(body.encode('utf-8'))
                 print("UTF_encoded: ", utf_encoded)
                 length_str = len(utf_encoded)
-                body = utf_encoded
+                body = utf_encoded.hex()
                 print("hex body: ", body)
                 # to-DO: modify the length of content-length header
                 headers['Content-Length:'] = str(length_str)
