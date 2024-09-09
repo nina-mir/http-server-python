@@ -95,13 +95,7 @@ def construct_response(status_line, headers, response_body):
 
     # check if response is supposed to have a body in gzip
     if 'gzip' in final:            
-        result =  "".join(
-                        [  str.encode(status_line),
-                            b"\r\n",
-                            str.encode(final),
-                            response_body
-                        ]
-                    )
+        result = str.encode(status_line) + b"\r\n" + str.encode(final) + response_body
         return result
 
     result = '\r\n'.join([status_line, final, response_body])
