@@ -100,7 +100,7 @@ def construct_response(status_line, headers, response_body):
                             str.encode(status_line),
                             b"\r\n",
                             str.encode(final),
-                            body
+                            response_body
                         ]
                     )
         return result
