@@ -172,7 +172,7 @@ def handle_GET(request, x, abs_path):
                 utf_encoded = gzip.compress(body.encode('utf-8'))
                 print("UTF_encoded: ", utf_encoded)
                 length_str = len(utf_encoded)
-                body = utf_encoded.hex()
+                body = utf_encoded
                 print("hex body: ", body)
                 # to-DO: modify the length of content-length header
                 headers['Content-Length:'] = str(length_str)
