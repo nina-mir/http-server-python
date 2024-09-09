@@ -27,6 +27,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((SERVER_HOST, SERVER_PORT))
 
+CLRF = "\r\n"
 
 # server_socket.listen(1)
 # print('Listening on port %s ...' % SERVER_PORT)
@@ -95,7 +96,7 @@ def construct_response(status_line, headers, response_body):
 
     # check if response is supposed to have a body in gzip
     if 'gzip' in final:            
-        result = str.encode(status_line) + b"\r\n" + str.encode(final) + b"\r\n" + str.encode(response_body) 
+        result = str.encode(status_line) + b"\r\n" + str.encode(final) + b"\r\n" + response_body 
         print("result from gzip", result)
         return result
 
@@ -180,7 +181,7 @@ def handle_GET(request, x, abs_path):
                 utf_encoded = gzip.compress(body.encode())
                 print("UTF_encoded: ", utf_encoded)
                 length_str = len(utf_encoded)
-                body = utf_encoded.hex()
+                body = utf_encoded
                 print("hex body: ", body)
                 # to-DO: modify the length of content-length header
                 headers['Content-Length:'] = str(length_str)
